@@ -628,4 +628,4 @@ html.board .focus-stage{bottom:calc(76px*var(--u))}
 html.board .panel .tb{width:40px;height:40px;border-radius:12px}html.board .panel .tb svg{width:20px;height:20px} /* panel zaten bütünüyle büyütülüyor */
 
 /* Pre A1: dolu boşluk kutusu tam beyaz (altındaki noktalar görünmesin) */
-.qz-b.full{background:#fff}
+.qz-b.full{background:#fff!important}
