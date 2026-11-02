@@ -1569,7 +1569,7 @@ const CACHE = 'arapca9-kitap';
 const canCache = 'caches' in window && location.protocol.startsWith('http');
 if ('serviceWorker' in navigator && canCache) Promise.resolve().catch(() => {});
 let listP = null;
-const fileList = () => listP ||= fetch('offline-files.json', {cache: 'no-cache'}).then(r => r.json()).catch(() => null);
+const fileList = () => listP ||= Promise.resolve(null);
 const absKey = p => new URL(p, location.href).href.split(/[?#]/)[0];
 const lowData = () => navigator.connection?.saveData || /2g/.test(navigator.connection?.effectiveType || '');
 
