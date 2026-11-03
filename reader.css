@@ -630,7 +630,12 @@ html.board .panel .tb{width:40px;height:40px;border-radius:12px}html.board .pane
 /* Pre A1: dolu boşluk kutusu tam beyaz (altındaki noktalar görünmesin) */
 .qz-b.full{background:#fff!important}
 
-/* Pre A1 · s.13 ekleri (ek13.js): katman sayfa resminin tamamını kaplar (resim 201×281 mm, kutu 195×275 oranında, object-fit:cover) */
+/* Pre A1 · s.13 ekleri ve koordinat düzeltmesi
+   Sayfa resmi 3 mm taşma paylı (2889×4038 px = 201×281 mm); okuyucu onu 195:275 kutuya object-fit:cover ile koyar
+   (yatayda %0,46'şar kırpılır). cevaplar.js / book-data.js kesimli sayfa yüzdesidir → katmanlar resimdeki kesim alanına
+   oturtulur. Önceden daireler, kutular, karekod düğmeleri ~1–2 mm sağa-aşağı kayıyordu (Rauf, 3 Kas). */
+.pg-qz,.pg-ex,.pg-hot{inset:auto;left:1.044%;top:1.068%;width:97.91%;height:97.864%}
+/* s.13 ekleri (ek13.js): katman sayfa resminin tamamını kaplar (resim 201×281 mm, kutu 195×275 oranında, object-fit:cover) */
 .pg-ek{position:absolute;top:0;height:100%;left:-.462%;width:100.924%;z-index:3;pointer-events:none}
 .flipping .pg-ek,.lens-sheet .pg-ek{display:none}
 .ek-karo,.ek-no{position:absolute;padding:0;background:none;border:0;pointer-events:none}
@@ -658,16 +663,6 @@ html.board .panel .tb{width:40px;height:40px;border-radius:12px}html.board .pane
 .focus .focus-frame .ek-hop{display:grid;place-items:center;position:absolute;left:-1.6cqw;top:-1.2cqw;width:2.3cqw;height:2.3cqw;border-radius:50%;background:var(--k-audio);color:#fff;box-shadow:0 .3cqw .8cqw rgba(0,0,0,.3)}
 .ek-hop svg{width:68%;height:68%}
 .ek-no.caliyor{animation:ekKonus .5s ease-in-out infinite alternate;box-shadow:0 0 0 .5cqw var(--k-audio)!important}
-/* büyük harf balonu */
-.ek-balon{position:absolute;left:12px;top:12px;z-index:4;display:flex;align-items:center;gap:14px;padding:8px 20px 8px 8px;border-radius:20px;background:var(--glass);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--line);box-shadow:0 18px 40px -18px rgba(0,0,0,.6);pointer-events:none;opacity:0;transform:translateY(-8px) scale(.94);transform-origin:0 0;transition:opacity .2s,transform .25s var(--ease)}
-.ek-balon.on{opacity:1;transform:none}
-.ek-bh{display:grid;place-items:center;width:76px;height:76px;border-radius:16px;background:#fffdf8;color:#d2342e;font:400 54px/1 var(--ar)}
-.ek-balon.sende .ek-bh{color:#1f5460;box-shadow:0 0 0 3px #1f5460}
-.ek-bt{display:flex;flex-direction:column;gap:2px}
-.ek-bad{font:400 28px/1.2 var(--ar);color:var(--ink)}
-.ek-bt small{font:700 12px var(--ui);color:var(--ink-3)}
-.ek-bt em{font-style:normal;color:var(--gold)}
 .ek-bar{height:3px;border-radius:2px;background:var(--glass-3);overflow:hidden}
 .ek-bar i{display:block;height:100%;width:0;background:var(--gold);transition:width .25s linear}
-@media (max-width:640px){.ek-bh{width:58px;height:58px;font-size:42px}.ek-bad{font-size:22px}}
-@media (prefers-reduced-motion:reduce){.ek-karo,.ek-balon{transition:none}.ek-karo.konus,.ek-karo.sira,.ek-karo.dokun,.ek-no.caliyor{animation:none}}
+@media (prefers-reduced-motion:reduce){.ek-karo{transition:none}.ek-karo.konus,.ek-karo.sira,.ek-karo.dokun,.ek-no.caliyor{animation:none}}

@@ -54,28 +54,18 @@ const hush = (keep) => { // bizimki çalarken okuyucunun çaları kapanır (teps
 const play = a => { a.playbackRate = hiz; try { a.currentTime = 0; } catch {} a.play().catch(() => {}); };
 RA.addEventListener('play', () => { stop(); mStop(); all().forEach(a => a.paused || a.pause()); tick(); }); // karekod çalınca bizimkiler susar
 
-/* ——— büyük harf balonu (odakta) ——— */
-let balon = null, balonT = 0;
-function bShow(i, sende) {
- if (!balon) { balon = document.createElement('div'); balon.className = 'ek-balon'; balon.setAttribute('aria-live', 'polite'); $('#focus').append(balon); }
- clearTimeout(balonT);
- balon.innerHTML = `<b class="ek-bh" lang="ar">${HARF[i]}</b><span class="ek-bt"><bdi class="ek-bad" lang="ar">${AD[i]}</bdi><small>${sende ? '<em>Sıra sende!</em>' : `${i + 1} / 28`}</small></span>`;
- // çerçevenin üstünde yer varsa orada ortalı (telefon), yoksa çerçevenin sol üst boşluğunda (yönerge sağda)
- const fr = $('#focusFrame').getBoundingClientRect(), h = balon.offsetHeight, up = fr.top - h - 10 >= 8;
- balon.style.left = (up ? Math.max(8, fr.left + fr.width / 2 - balon.offsetWidth / 2) : Math.max(8, fr.left + 10)) + 'px';
- balon.style.top = (up ? fr.top - h - 10 : Math.max(8, fr.top + 8)) + 'px';
- balon.classList.toggle('sende', !!sende); balon.classList.add('on');
-}
-const bHide = ms => { clearTimeout(balonT); balonT = setTimeout(() => balon?.classList.remove('on', 'sende'), ms || 0); };
+/* tepsi yazısı (odakta): tekrar kipinde sıranın kimde olduğu */
+const MSG = 'Harfe dokun, adını dinle. Sırayla dinlerken okunan harf yanar.';
+const say = t => { const m = $('#fq .fq-msg'); if (m && F() === 0) m.textContent = t || MSG; };
 
 /* ——— ① harfler: durum her sayfa kopyasına boyanır ——— */
 const D = {kip: null, on: false, i: -1, tekrar: false, tok: 0, t: 0};
-function paint(n, speak, turn) {
+function paint(n, speak, turn, idle) { // idle: duraklayınca yanan harf söner, okunanların çizgisi kalır
  pages().forEach(pg => layer(pg).querySelectorAll('.ek-karo').forEach((k, j) => {
   k.classList.toggle('okundu', n >= 28 || j < n);
-  k.classList.toggle('etkin', j === n && !turn);
-  k.classList.toggle('konus', j === n && !!speak);
-  k.classList.toggle('sira', j === n && !!turn);
+  k.classList.toggle('etkin', j === n && !turn && !idle);
+  k.classList.toggle('konus', j === n && !!speak && !idle);
+  k.classList.toggle('sira', j === n && !!turn && !idle);
  }));
 }
 const at = t => { let n = -1; Z.alfabe.forEach((h, j) => { if (t >= h.a - .06) n = j; }); return n; };
@@ -86,14 +76,14 @@ function tick() {
  const ra = !RA.paused && /\/alfabe\.mp3$/.test(RA.src), ours = D.on && D.kip === 'alfabe', rq = !RA.paused && /\/harf_sec\.mp3$/.test(RA.src);
  if (ra || ours) {
   const src = ra ? RA : A, t = src.currentTime, n = at(t);
-  if (n >= 0) { paint(n, t <= Z.alfabe[n].b + .12); if (n !== seen && F() === 0) bShow(n); seen = n; if (ours) D.i = n; }
+  if (n >= 0) { paint(n, t <= Z.alfabe[n].b + .12); seen = n; if (ours) D.i = n; }
   bar(t / Z.alfabeSure);
  }
  if (rq) { let n = -1; Z.madde.forEach((m, k) => { if (RA.currentTime >= m.a - .05) n = k; }); groups(n); }
  if (ra || ours || rq) raf = requestAnimationFrame(tick);
 }
 RA.addEventListener('ended', () => { if (/\/alfabe\.mp3$/.test(RA.src)) { paint(28); setTimeout(() => D.on || paint(-1), 1600); } groups(-1); });
-RA.addEventListener('pause', () => { if (/\/harf_sec\.mp3$/.test(RA.src)) groups(-1); });
+RA.addEventListener('pause', () => { if (/\/harf_sec\.mp3$/.test(RA.src)) groups(-1); if (/\/alfabe\.mp3$/.test(RA.src) && !RA.ended && seen >= 0) paint(seen, false, false, true); });
 
 function aStart(from) {
  D.kip = 'alfabe'; D.on = true;
@@ -108,10 +98,10 @@ function aStart(from) {
 function rStep(i) { // tekrar kipi: harf okunur → 2 sn sıra öğrencide → sonraki
  const j = ++D.tok;
  if (i >= 28) return done();
- D.i = i; paint(i, true); bShow(i); bar(i / 28);
+ D.i = i; paint(i, true); say(`${i + 1} / 28 · dinle…`); bar(i / 28);
  A.onended = () => {
   if (j !== D.tok || !D.on) return;
-  paint(i, false, true); bShow(i, true);
+  paint(i, false, true); say('Sıra sende! Harfi sen söyle.');
   D.t = setTimeout(() => { if (j === D.tok) { bar((i + 1) / 28); rStep(i + 1); } }, 2000 / hiz);
  };
  A.src = harf[i].src; A.playbackRate = hiz;
@@ -128,10 +118,10 @@ function stop() {
  if (!D.on) return;
  D.on = false; D.tok++; clearTimeout(D.t);
  if (!A.paused) A.pause();
- if (D.i >= 0) paint(D.i);
- bHide(900); tray();
+ if (D.i >= 0) paint(D.i, false, false, true);
+ tray();
 }
-function done() { D.on = false; D.tok++; clearTimeout(D.t); D.i = 28; paint(28); bar(1); bHide(900); tray(); }
+function done() { D.on = false; D.tok++; clearTimeout(D.t); D.i = 28; paint(28); bar(1); tray(); }
 function again() { stop(); D.kip = null; D.i = -1; paint(-1); bar(0); start(); }
 
 /* odaktaki tepsi (okuyucunun .fq düzeni) */
@@ -141,7 +131,7 @@ function tray() {
  const el = $('#fq'); if (F() !== 0) return;
  const label = D.on ? 'Duraklat' : D.i > 0 && D.i < 28 ? 'Devam' : 'Sırayla dinle';
  el.hidden = false;
- el.innerHTML = `<div class="fq-row"><span class="fq-msg">Harfe dokun, adını dinle. Sırayla dinlerken okunan harf yanar.</span>
+ el.innerHTML = `<div class="fq-row"><span class="fq-msg">${MSG}</span>
  <button class="fq-btn pri" data-ek="dinle">${icon(D.on ? 'i-pause' : 'i-play')}${label}</button><button class="fq-btn${D.tekrar ? ' pri2' : ''}" data-ek="tekrar" aria-pressed="${D.tekrar}">${icon('i-loop')}Sen tekrar et</button><button class="fq-btn" data-ek="bastan">${icon('i-undo')}Baştan</button><button class="fq-btn" data-ek="hiz" aria-label="Hız">${hiz === 1 ? '1×' : '0,75×'}</button></div><div class="ek-bar"><i></i></div>`;
  bar(D.i >= 28 ? 1 : D.i > 0 ? D.i / 28 : 0);
  api?.fit();
@@ -179,7 +169,6 @@ $('#focusFrame').addEventListener('click', e => {
  if (k) {
   const i = +k.dataset.h; seed(); stop(); mStop(); hush(harf[i]); play(harf[i]);
   k.classList.remove('dokun'); void k.offsetWidth; k.classList.add('dokun'); setTimeout(() => k.classList.remove('dokun'), 520);
-  bShow(i); bHide(1400);
  } else if (n) mPlay(+n.dataset.m);
  else if (q) { // okuyucu seçimi işledi (önce o dinler); seçildiyse dairenin harfi çalar
   const j = +q.dataset.i, g = SEC.g[j];
@@ -198,6 +187,6 @@ EK[NUM] = {
   if (i === 0) { a.tool('answer'); tray(); if (D.i >= 0) paint(D.i); }
   if (D.on || !RA.paused) tick();
  },
- kapa() { stop(); mStop(); bHide(0); region = -1; }
+ kapa() { stop(); mStop(); region = -1; }
 };
 })();
