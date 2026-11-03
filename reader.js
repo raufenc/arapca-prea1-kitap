@@ -280,6 +280,7 @@ function openResource(id) {
 
 /* ses çalar */
 const audio = new Audio(); audio.preload = 'auto';
+window.EK = Object.assign(window.EK || {}, {audio}); // sayfa ekleri (ek13.js) bu çaları dinler
 let audioRes = null;
 const rates = [1, .75, .5, 1.25];
 function fmt(t) { t = Math.max(0, t | 0); return `${(t / 60) | 0}:${String(t % 60).padStart(2, '0')}`; }
@@ -827,7 +828,13 @@ function fTool(t) {
  $('#fSwatches').classList.toggle('dim', t !== 'pen' && t !== 'marker');
  $('#focus').dataset.tool = t;
 }
+// sayfa ekleri için: Cevapla aracını açma ve tepsi değişince yerleşim (qzTray'deki gibi)
+const EKAPI = {
+ tool: t => { $('#fAnswer').hidden = false; fTool(t); },
+ fit: () => { const el = $('#fq'), bar = $('#focus .focus-bar').offsetHeight || 56; el.style.bottom = bar + 18 + 'px'; $('#focusStage').style.bottom = bar + 26 + el.offsetHeight + 'px'; if (F.open) fLayout(); }
+};
 function openFocus(num, i, from) {
+ if (F.open) window.EK?.[F.num]?.kapa?.();
  const fresh = !F.open;
  F.open = true; F.num = num; F.i = i;
  const f = $('#focus'), frame = $('#focusFrame');
@@ -841,6 +848,7 @@ function openFocus(num, i, from) {
   frame.append(win);
  });
  qzOpen();
+ window.EK?.[num]?.ac?.(i, EKAPI);
  fLayout(); fLabel(); tip.hidden = true;
  const start = from || (fresh ? bookRegionRect(num, i) : null);
  if (start) { // kitaptaki yerinden büyüyerek gelsin
@@ -856,6 +864,7 @@ function openFocus(num, i, from) {
 }
 function closeFocus() {
  if (!F.open) return;
+ window.EK?.[F.num]?.kapa?.();
  F.open = false; F.laser = []; F.hover = null;
  renderInk(F.num); store.set('ink', S.ink); qzClose();
  const f = $('#focus'), frame = $('#focusFrame'), to = bookRegionRect(F.num, F.i);

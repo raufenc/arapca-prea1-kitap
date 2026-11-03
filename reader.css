@@ -629,3 +629,45 @@ html.board .panel .tb{width:40px;height:40px;border-radius:12px}html.board .pane
 
 /* Pre A1: dolu boşluk kutusu tam beyaz (altındaki noktalar görünmesin) */
 .qz-b.full{background:#fff!important}
+
+/* Pre A1 · s.13 ekleri (ek13.js): katman sayfa resminin tamamını kaplar (resim 201×281 mm, kutu 195×275 oranında, object-fit:cover) */
+.pg-ek{position:absolute;top:0;height:100%;left:-.462%;width:100.924%;z-index:3;pointer-events:none}
+.flipping .pg-ek,.lens-sheet .pg-ek{display:none}
+.ek-karo,.ek-no{position:absolute;padding:0;background:none;border:0;pointer-events:none}
+.ek-karo{border-radius:1.3cqw;transition:transform .2s var(--ease),box-shadow .2s,background .2s}
+.ek-karo span{display:none;place-items:center;width:100%;height:100%;font:400 5.4cqw/1.5 var(--ar);color:#d2342e;padding-bottom:.6cqw;box-sizing:border-box}
+.ek-karo.okundu{box-shadow:inset 0 -.55cqw 0 rgba(31,84,96,.55)}
+.ek-karo.etkin,.ek-karo.sira,.ek-karo.dokun{z-index:2;background:#fffdf8}
+.ek-karo.etkin span,.ek-karo.sira span,.ek-karo.dokun span{display:grid}
+.ek-karo.etkin{transform:scale(1.16);box-shadow:0 0 0 .5cqw #d2342e,0 1.2cqw 2.6cqw rgba(0,0,0,.28)}
+.ek-karo.konus{animation:ekKonus .5s ease-in-out infinite alternate}
+.ek-karo.sira{transform:scale(1.1);animation:ekSira 1s ease-in-out infinite}
+.ek-karo.sira span{color:#1f5460}
+.ek-karo.dokun{animation:ekDokun .5s var(--ease)}
+@keyframes ekKonus{to{box-shadow:0 0 0 .9cqw #d2342e,0 1.2cqw 2.6cqw rgba(0,0,0,.28)}}
+@keyframes ekSira{0%,100%{box-shadow:0 0 0 .4cqw #1f5460}50%{box-shadow:0 0 0 1.1cqw rgba(31,84,96,.35)}}
+@keyframes ekDokun{0%{transform:scale(1);box-shadow:0 0 0 0 #d2342e}45%{transform:scale(1.2);box-shadow:0 0 0 .6cqw #d2342e}100%{transform:scale(1);box-shadow:0 0 0 0 rgba(210,52,46,0)}}
+.ek-grup{position:absolute;border-radius:1.6cqw;transition:background .25s,box-shadow .25s}
+.ek-grup.caliyor{background:rgba(240,160,60,.14);box-shadow:inset 0 0 0 .35cqw rgba(240,160,60,.85)}
+.ek-no{border-radius:50%}
+.ek-hop{display:none}
+/* odakta (Cevapla): karolar ve madde numaraları dokunulur */
+.focus[data-tool="answer"] .focus-frame .ek-karo,.focus[data-tool="answer"] .focus-frame .ek-no{pointer-events:auto;cursor:pointer;touch-action:manipulation}
+.focus[data-tool="answer"] .focus-frame .ek-karo:hover:not(.etkin):not(.sira){background:rgba(227,184,108,.18)}
+.focus .focus-frame .ek-no{box-shadow:0 0 0 .3cqw var(--k-audio)}
+.focus .focus-frame .ek-hop{display:grid;place-items:center;position:absolute;left:-1.6cqw;top:-1.2cqw;width:2.3cqw;height:2.3cqw;border-radius:50%;background:var(--k-audio);color:#fff;box-shadow:0 .3cqw .8cqw rgba(0,0,0,.3)}
+.ek-hop svg{width:68%;height:68%}
+.ek-no.caliyor{animation:ekKonus .5s ease-in-out infinite alternate;box-shadow:0 0 0 .5cqw var(--k-audio)!important}
+/* büyük harf balonu */
+.ek-balon{position:absolute;left:12px;top:12px;z-index:4;display:flex;align-items:center;gap:14px;padding:8px 20px 8px 8px;border-radius:20px;background:var(--glass);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--line);box-shadow:0 18px 40px -18px rgba(0,0,0,.6);pointer-events:none;opacity:0;transform:translateY(-8px) scale(.94);transform-origin:0 0;transition:opacity .2s,transform .25s var(--ease)}
+.ek-balon.on{opacity:1;transform:none}
+.ek-bh{display:grid;place-items:center;width:76px;height:76px;border-radius:16px;background:#fffdf8;color:#d2342e;font:400 54px/1 var(--ar)}
+.ek-balon.sende .ek-bh{color:#1f5460;box-shadow:0 0 0 3px #1f5460}
+.ek-bt{display:flex;flex-direction:column;gap:2px}
+.ek-bad{font:400 28px/1.2 var(--ar);color:var(--ink)}
+.ek-bt small{font:700 12px var(--ui);color:var(--ink-3)}
+.ek-bt em{font-style:normal;color:var(--gold)}
+.ek-bar{height:3px;border-radius:2px;background:var(--glass-3);overflow:hidden}
+.ek-bar i{display:block;height:100%;width:0;background:var(--gold);transition:width .25s linear}
+@media (max-width:640px){.ek-bh{width:58px;height:58px;font-size:42px}.ek-bad{font-size:22px}}
+@media (prefers-reduced-motion:reduce){.ek-karo,.ek-balon{transition:none}.ek-karo.konus,.ek-karo.sira,.ek-karo.dokun,.ek-no.caliyor{animation:none}}
