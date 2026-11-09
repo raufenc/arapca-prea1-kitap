@@ -1,4 +1,4 @@
-/* Pre A1 · s.13 ekleri — Arapça 9 okuyucusunun odak görünümüne takılır (reader.js'teki window.EK kancası).
+/* Pre A1 · s.14 (v9b; eskiden s.13) ekleri — Arapça 9 okuyucusunun odak görünümüne takılır (reader.js'teki window.EK kancası).
    ① 28 harf: okunurken harf yanar (kitapta صَوْت 3 çalarken de), harfe dokununca adı çalar, "sen tekrar et" kipi.
    ② dinle-seç: her maddenin kendi dinle düğmesi, seçilen dairenin harfi çalar, صَوْت 4 çalarken çalan madde vurgulanır.
    Cevaplama, kontrol, cevapları göster okuyucunun kendisinde kalır.
@@ -6,11 +6,11 @@
    Zamanlama: zaman13.js (ses dosyasından silencedetect ile, demo13_kaynak/kes.py). */
 (() => {
 'use strict';
-const EK = window.EK, Z = window.ZAMAN, SEC = window.CEVAP?.['13.2']?.q[0];
+const EK = window.EK, Z = window.ZAMAN, SEC = window.CEVAP?.['14.2']?.q[0];
 if (!EK || !Z || !SEC) return;
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const icon = id => `<svg><use href="#${id}"/></svg>`;
-const NUM = 13, TW = 201, TH = 281, BL = 3;
+const NUM = 14, TW = 201, TH = 281, BL = 3;
 const X = mm => (mm + BL) / TW * 100, Y = mm => (mm + BL) / TH * 100;
 const PX = p => X(p * 1.95), PY = p => Y(p * 2.75); // kesimli sayfa yüzdesi (cevaplar.js) → resim yüzdesi
 const HARF = 'ا ب ت ث ج ح خ د ذ ر ز س ش ص ض ط ظ ع غ ف ق ك ل م ن ه و ي'.split(' ');
@@ -29,7 +29,7 @@ const MADDE = AR.map((_, g) => {
 });
 const LAYER = HARF.map((h, i) => {
  const c = i % 7, r = (i / 7) | 0;
- return `<button class="ek-karo" data-h="${i}" style="${box(X(153.4 - c * 19.733), Y(120 + r * 18.6), 17.6 / TW * 100, 16.6 / TH * 100)}" aria-label="Harf ${h} (${AD[i]})" tabindex="-1"><span lang="ar">${h}</span></button>`;
+ return `<button class="ek-karo" data-h="${i}" style="${box(X(145 - c * 20.1667), Y(49 + r * 22), 18 / TW * 100, 19 / TH * 100)}" aria-label="Harf ${h} (${AD[i]})" tabindex="-1"><span lang="ar">${h}</span></button>`;
 }).join('') + MADDE.map((m, g) => `<div class="ek-grup" data-g="${g}" style="${box(...m.grup)}"></div><button class="ek-no" data-m="${g}" style="${box(...m.no)}" aria-label="${g + 1}. maddeyi dinle" tabindex="-1"><span class="ek-hop">${icon('i-audio')}</span></button>`).join('');
 function layer(pg) {
  let el = pg.querySelector('.pg-ek');
@@ -165,14 +165,14 @@ function mPlay(g) {
 /* ——— dokunuşlar (odakta) ——— */
 $('#focusFrame').addEventListener('click', e => {
  if (!inFocus()) return;
- const k = e.target.closest('.ek-karo'), n = e.target.closest('.ek-no'), q = e.target.closest('.qz-p[data-k="13.2"]');
+ const k = e.target.closest('.ek-karo'), n = e.target.closest('.ek-no'), q = e.target.closest('.qz-p[data-k="14.2"]');
  if (k) {
   const i = +k.dataset.h; seed(); stop(); mStop(); hush(harf[i]); play(harf[i]);
   k.classList.remove('dokun'); void k.offsetWidth; k.classList.add('dokun'); setTimeout(() => k.classList.remove('dokun'), 520);
  } else if (n) mPlay(+n.dataset.m);
  else if (q) { // okuyucu seçimi işledi (önce o dinler); seçildiyse dairenin harfi çalar
   const j = +q.dataset.i, g = SEC.g[j];
-  if (!$(`#focusFrame .qz-p[data-k="13.2"][data-i="${j}"].on`) || mOn >= 0 || D.on) return;
+  if (!$(`#focusFrame .qz-p[data-k="14.2"][data-i="${j}"].on`) || mOn >= 0 || D.on) return;
   const h = HARF.indexOf(SECENEK[g][j - g * 3]); seed(); hush(harf[h]); setTimeout(() => play(harf[h]), 120);
  }
 });
