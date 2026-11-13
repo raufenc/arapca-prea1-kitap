@@ -275,7 +275,7 @@ function openResource(id) {
   if (m?.kind === 'video') return openVideo(r, m);
  }
  if (r.document) return openDocument(r);
- if (r.url) window.open(r.url, '_blank', 'noopener');
+ if (r.url) window.open(r.url, '_blank', 'noopener'); else toast('Bu bağlantı hazırlanıyor.');
 }
 
 /* ses çalar */
@@ -285,6 +285,7 @@ let audioRes = null;
 const rates = [1, .75, .5, 1.25];
 function fmt(t) { t = Math.max(0, t | 0); return `${(t / 60) | 0}:${String(t % 60).padStart(2, '0')}`; }
 function playAudio(r, m) {
+ if (m.bekliyor) return toast('Bu kayıt yenileniyor.');
  const pl = $('#player');
  if (audioRes === r.id && !audio.ended) { audio.paused ? audio.play() : audio.pause(); return; }
  audioRes = r.id; audio.src = m.src; audio.playbackRate = rates[S.rateIdx || 0];
@@ -340,6 +341,7 @@ function closeModal(silent) {
 function frameWidth(ratio, extra = 70) { return Math.round(Math.min(1180, innerWidth - 40, (innerHeight - extra - 40) * ratio)); }
 
 function openVideo(r, m) {
+ if (m.bekliyor) return toast('Bu kayıt yenileniyor.');
  const v = document.createElement('video');
  v.src = m.src; v.controls = true; v.autoplay = true; v.playsInline = true; v.preload = 'auto';
  openModal({kind: 'video', kicker: `Sayfa ${r.page} · Video`, title: r.title, body: v, width: frameWidth(16 / 9)});
@@ -516,10 +518,10 @@ function panelToc() {
  const pct = Math.round(S.seen.size / N * 100), uq = store.get('unitQuiz', null);
  const doneActs = Object.values(S.acts).filter(a => a.complete).length;
  let h = `<div class="p-hero"><small>LİSE HAZIRLIK · PRE A1</small><span class="ar">${esc(B.unitArabic)}</span><b>${esc(B.title)}</b>
-  <div class="meta">${(B.units || []).length || 1} ünite · ${N} sayfa · ${B.stats.audio} ses · ${B.stats.video} video · ${B.activities.length} etkinlik</div>
-  <div class="prog"><i style="width:${pct}%"></i></div><div class="meta">Gezilen sayfalar %${pct} · Tamamlanan etkinlik ${doneActs}/${B.activities.length}</div></div>
+  <div class="meta">${(B.units || []).length || 1} ünite · ${N} sayfa · ${B.stats.audio} ses · ${B.stats.video} video · ${B.activities.length || Object.keys(window.CEVAP || {}).length} etkinlik</div>
+  <div class="prog"><i style="width:${pct}%"></i></div><div class="meta">Gezilen sayfalar %${pct}${B.activities.length ? ` · Tamamlanan etkinlik ${doneActs}/${B.activities.length}` : ''}</div></div>
   ${unitProgressHTML()}
-  <button class="row k-quiz" data-act="unit-quiz"><span class="ic">${icon('i-spark')}</span><span class="tx"><b>1. ünite değerlendirmesi</b><small>${(C.quiz || []).length} soruluk kısa test${uq ? ` · son: ${uq.right}/${uq.total}` : ''}</small></span></button>`;
+  <button class="row k-quiz" data-act="unit-quiz"${(C.quiz || []).length ? '' : ' style="display:none"'}><span class="ic">${icon('i-spark')}</span><span class="tx"><b>1. ünite değerlendirmesi</b><small>${(C.quiz || []).length} soruluk kısa test${uq ? ` · son: ${uq.right}/${uq.total}` : ''}</small></span></button>`;
  const cur = chapterAt(S.visible[0]).page;
  CHAPTERS.forEach(c => {
   if (c.group) h += `<div class="grp">${esc(c.group)}</div>`;
